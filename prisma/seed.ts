@@ -7,7 +7,7 @@ async function main() {
     update: {},
     create: {
       email: 'user@gmail.com',
-      password: 'password',
+      password: '$2b$10$7AgCzQhqFSsTS6RyhoP1nuxOd2K44DKoTDd4MaIXSZjn2bbsyGQBy',
     },
   });
 
