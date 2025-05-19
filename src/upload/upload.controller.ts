@@ -1,20 +1,21 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UploadService } from './upload.service';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import { UploadDto, UploadResponseDto } from './dto/upload.dto';
-import { FileStatus } from '@prisma/client';
+import { FileStatusResponseDto, UploadDto, UploadResponseDto } from './dto/upload.dto';
+import { File, FileStatus } from '@prisma/client';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller('upload')
+@Controller('files')
 export class UploadController {
     constructor(
         private readonly uploadService: UploadService
     ) { }
-    @Post('')
+
+    @Post('upload')
     @HttpCode(HttpStatus.CREATED)
     @ApiConsumes('multipart/form-data')
     @ApiCreatedResponse({
@@ -54,4 +55,27 @@ export class UploadController {
         }
     }
 
+    @Get(':id')
+    @ApiOkResponse({
+        description: 'Successful user login',
+        type: FileStatusResponseDto,
+    })
+    @HttpCode(HttpStatus.OK)
+    async getFileStatus(@Req() req: Request, @Param('id') fileId: string): Promise<FileStatusResponseDto> {
+        try {
+            const userId: number = req.user.id
+            const result: Partial<File> = await this.uploadService.getFileStatus(userId, parseInt(fileId))
+            return {
+                statusCode: HttpStatus.OK,
+                data: result,
+                message: "File status"
+            };
+        } catch (error) {
+            return {
+                statusCode: error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+                data: {},
+                message: error?.message || "Internal Server Error"
+            }
+        }
+    }
 }

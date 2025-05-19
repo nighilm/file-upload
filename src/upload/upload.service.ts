@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { File } from '@prisma/client';
 import { mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
@@ -51,4 +51,27 @@ export class UploadService {
         }
     }
 
+    async getFileStatus(userId: number, fileId: number): Promise<Partial<File>> {
+        try {
+            const file: Partial<File> | null = await this.prismaService.file.findFirst({
+                where: { id: fileId, userId },
+                select: {
+                    originalFilename: true,
+                    title: true,
+                    description: true,
+                    storagePath: true,
+                    status: true,
+                    extractedData: true
+                }
+            })
+
+            if (!file) {
+                throw new NotFoundException("File details not found for the user")
+            }
+
+            return file
+        } catch (error) {
+            throw error
+        }
+    }
 }
