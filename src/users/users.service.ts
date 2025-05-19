@@ -9,8 +9,13 @@ export class UsersService {
     private readonly prismaService: PrismaService
   ) { }
 
-  async findUserByEmail(email: string): Promise<User | undefined> {
+  async findUserByEmail(email: string): Promise<User | null> {
     const user = await this.prismaService.user.findFirst({ where: { email } })
+    return user
+  }
+
+  async findUserById(id: number): Promise<Partial<User> | null> {
+    const user = await this.prismaService.user.findFirst({ where: { id }, select: { id: true, email: true } })
     return user
   }
 }
