@@ -6,7 +6,7 @@ import { extname } from 'path';
 import { createInterface } from 'readline';
 import { JobsService } from './jobs.service';
 import { FileStatus, JobStatus } from '@prisma/client';
-import { QUEUE_NAME } from 'src/utils/constants';
+import { QUEUE_NAME } from '../utils/constants';
 
 @Processor(QUEUE_NAME)
 @Injectable()

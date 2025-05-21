@@ -8,8 +8,8 @@ import { QueueConsumerService } from './queue-consumer.service';
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import * as  basicAuth from 'express-basic-auth';
 import { JobsService } from './jobs.service';
-import { PrismaModule } from 'src/prisma/prisma.module';
-import { QUEUE_NAME } from 'src/utils/constants';
+import { PrismaModule } from '../prisma/prisma.module';
+import { QUEUE_NAME } from '../utils/constants';
 
 @Module({
   imports: [

@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { File, FileStatus } from '@prisma/client';
+import { File } from '@prisma/client';
 import { mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { JobsService } from 'src/queue/jobs.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { JobsService } from '../queue/jobs.service';
 
 @Injectable()
 export class UploadService {

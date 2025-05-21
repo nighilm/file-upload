@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { FileStatus, Job, JobStatus } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { QueueProducerService } from 'src/queue/queue-producer.service';
-import { QUEUE_NAME } from 'src/utils/constants';
+import { PrismaService } from '../prisma/prisma.service';
+import { QueueProducerService } from '../queue/queue-producer.service';
+import { QUEUE_NAME } from '../utils/constants';
 
 @Injectable()
 export class JobsService {
