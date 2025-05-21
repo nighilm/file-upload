@@ -1,0 +1,23 @@
+# Node modules and build output
+node_modules
+dist
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Prisma generated files
+prisma/dev.db
+generated
+
+# Local uploads or temp files
+uploads
+tmp
+*.log
+
+# Git and Docker files
+.git
+.gitignore
+Dockerfile
+docker-compose.yml

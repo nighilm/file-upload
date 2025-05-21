@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { UploadService } from './upload.service';
 import { UploadController } from './upload.controller';
-import { PrismaModule } from 'src/prisma/prisma.module';
-import { QueueModule } from 'src/queue/queue.module';
+import { PrismaModule } from '../prisma/prisma.module';
+import { QueueModule } from '../queue/queue.module';
 
 @Module({
   imports: [PrismaModule, QueueModule],

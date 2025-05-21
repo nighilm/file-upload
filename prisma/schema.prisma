@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output = "../../node_modules/.prisma/client"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -29,13 +29,13 @@ enum JobStatus {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   password  String
-  createdAt DateTime @default(now())  @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  files     File[]
-  
+  files File[]
+
   @@map("users")
 }
 
@@ -50,22 +50,22 @@ model File {
   extractedData    String?    @map("extracted_data")
   createdAt        DateTime   @default(now()) @map("created_at")
 
-  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobs             Job[]
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs Job[]
 
   @@map("files")
 }
 
 model Job {
-  id            Int       @id @default(autoincrement())
-  fileId        Int       @map("file_id")
-  jobType       String?   @map("job_type")
-  status        JobStatus
-  errorMessage  String?   @map("error_message")
-  startedAt     DateTime? @map("started_at")
-  completedAt   DateTime? @map("completed_at")
+  id           Int       @id @default(autoincrement())
+  fileId       Int       @map("file_id")
+  jobType      String?   @map("job_type")
+  status       JobStatus
+  errorMessage String?   @map("error_message")
+  startedAt    DateTime? @map("started_at")
+  completedAt  DateTime? @map("completed_at")
 
-  file          File      @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
   @@map("jobs")
 }
