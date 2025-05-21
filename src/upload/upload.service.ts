@@ -1,14 +1,16 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { File } from '@prisma/client';
+import { File, FileStatus } from '@prisma/client';
 import { mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { JobsService } from 'src/queue/jobs.service';
 
 @Injectable()
 export class UploadService {
     constructor(
-        private readonly prismaService: PrismaService
+        private readonly prismaService: PrismaService,
+        private readonly jobsService: JobsService,
     ) { }
 
     static getMulterOptions() {
@@ -33,18 +35,19 @@ export class UploadService {
             if (!file) {
                 throw new BadRequestException("Please upload a file")
             }
-            const originalFilename: string = file.originalname
-            const newFileName: string = `file_${Date.now()}${extname(file.originalname)}`;
-            const storagePath: string = `${userId}/${newFileName}`;
+
             const fileObj: File = await this.prismaService.file.create({
                 data: {
-                    originalFilename,
+                    originalFilename: file.originalname,
                     userId,
-                    storagePath,
+                    storagePath: file.path,
                     title,
                     description
                 }
             })
+
+            await this.jobsService.createJob(fileObj.id, file.path)
+
             return fileObj.id
         } catch (error) {
             throw error
@@ -61,7 +64,7 @@ export class UploadService {
                     description: true,
                     storagePath: true,
                     status: true,
-                    extractedData: true
+                    extractedData: true,
                 }
             })
 
