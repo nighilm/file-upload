@@ -1,99 +1,268 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+---
+# 📁 NestJS File Upload & Processing API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS application for authenticated file uploads with metadata, asynchronous background processing, and a secure API architecture.
+---
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Features
 
-## Description
+- 🔐 JWT-based authentication
+- 📤 Authenticated file uploads (any file type)
+- ⚙️ Asynchronous file processing using BullMQ (Redis)
+- 🔄 Rate limiting with Throttler Guard
+- 📑 Swagger API documentation
+- 🐳 Docker-based local environment
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+  ***
 
-## Project setup
+## 🧰 Technologies Used
 
-```bash
-$ npm install
+- **Node.js** v22
+- **NestJS** framework
+- **PostgreSQL** with **Prisma ORM**
+- **Redis** + **BullMQ** for background jobs
+- **Multer** for file handling
+- **JWT** for secure authentication
+- **Swagger** for API documentation
+- **Docker** for containerized environment
+- **@nestjs/throttler** for rate limiting
+
+---
+
+## 📦 API Endpoints
+
+### 1. 🔐 POST `/auth/login`
+
+**Authenticate users and issue JWT.**
+
+**Request:**
+
+```json
+{
+  "email": "your-email",
+  "password": "your-password"
+}
 ```
 
-## Compile and run the project
+**Response:**
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "accessToken": "<JWT token>"
+  },
+  "message": "Login successfull"
+}
 ```
 
-## Run tests
+> **Note:** JWT is required for all subsequent requests.
 
-```bash
-# unit tests
-$ npm run test
+---
 
-# e2e tests
-$ npm run test:e2e
+### 2. 📤 POST `/files/upload`
 
-# test coverage
-$ npm run test:cov
+**Upload a file with optional metadata.**
+
+**Headers:**
+
+```
+Authorization: Bearer <JWT>
 ```
 
-## Deployment
+**Form Data:**
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- `file`: (any file)
+- `title`: (optional)
+- `description`: (optional)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+**Response:**
 
-```bash
-$ npm install -g mau
-$ mau deploy
+```json
+{
+  "statusCode": 201,
+  "data": {
+    "fileId": "1",
+    "status": "uploaded"
+  },
+  "message": "File upload successful"
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+### 3. ⚙️ File Processing (Async Job)
 
-Check out a few resources that may come in handy when working with NestJS:
+**Automatically triggered post-upload.**
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- Non-`.txt` files → status: `failed`
+- `.txt` files → extract last line, save to DB
+- Status transitions: `uploaded → processing → processed/failed`
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 4. 📄 GET `/files/:id`
 
-## Stay in touch
+**Get file status and metadata.**
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**Headers:**
 
-## License
+```
+Authorization: Bearer <JWT>
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+**Response:**
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "originalFilename": "README.md",
+    "title": null,
+    "description": null,
+    "storagePath": "uploads/1/file_1747832939867.md",
+    "status": "failed",
+    "extractedData": null
+  },
+  "message": "File status"
+}
+```
+
+---
+
+## 🏗️ Design Choices
+
+- **Modular Architecture** with NestJS for scalability and maintainability
+- **Prisma** for easy schema management and type-safe queries
+- **BullMQ with Redis** for efficient job queuing and retries
+- **Multer** for handling multipart/form-data uploads
+- **Local Disk Storage** for simplicity in development (can be replaced with S3 in production)
+
+---
+
+## ⚠️ Limitations
+
+- No user registration endpoint (assumes pre-existing user).
+
+---
+
+## 📦 Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/nighilm/file-upload.git
+cd file-upload
+```
+
+### 2. Create `.env` file
+
+```env
+PORT=3000
+NODE_ENV=development
+
+DATABASE_URL="postgres://<postgres_username>:<postgres_password>@<postgres_host>:<postgres_port>/file-upload"
+POSTGRES_USERNAME=myuser
+POSTGRES_PASSWORD=mypassword
+POSTGRES_PORT=5432
+
+JWT_ACCESS_TOKEN_SECRET="secret"
+ACCESS_TOKEN_VALIDITY_DURATION='1d'
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+BULL_BOARD_ADMIN_ROUTE='admin/queues'
+BULL_BOARD_ADMIN_PASSWORD=password
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Run PostgreSQL and Redis (Docker Compose)
+
+```bash
+docker-compose up --build -V -d
+```
+
+### 5. Run Prisma migrations
+
+- Create database in postgres named `file-upload`
+  -Run the Prisma migration and seed commands from within the Docker container where the application is running, using its internal CLI.
+
+```bash
+npm run migrate
+npm run seed
+```
+
+### 7. Access Swagger Docs
+
+```
+http://localhost:3000/api
+```
+
+---
+
+## 🗄️ Prisma Schema Snapshot
+
+```prisma
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  files File[]
+
+  @@map("users")
+}
+
+model File {
+  id               Int        @id @default(autoincrement())
+  userId           Int        @map("user_id")
+  originalFilename String     @map("original_filename")
+  storagePath      String     @map("storage_path")
+  title            String?
+  description      String?
+  status           FileStatus @default(uploaded)
+  extractedData    String?    @map("extracted_data")
+  createdAt        DateTime   @default(now()) @map("created_at")
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs Job[]
+
+  @@map("files")
+}
+
+model Job {
+  id           Int       @id @default(autoincrement())
+  fileId       Int       @map("file_id")
+  jobType      String?   @map("job_type")
+  status       JobStatus
+  errorMessage String?   @map("error_message")
+  startedAt    DateTime? @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@map("jobs")
+}
+
+```
+
+---
+
+## ✅ Test Accounts
+
+For testing login:
+
+```json
+{
+  "email": "user@gmail.com",
+  "password": "password"
+}
+```
