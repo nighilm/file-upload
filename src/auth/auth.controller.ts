@@ -13,21 +13,13 @@ export class AuthController {
   })
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
-    try {
-      const accessToken = await this.authService.login(loginDto.email, loginDto.password);
-      return {
-        statusCode: HttpStatus.OK,
-        data: {
-          accessToken
-        },
-        message: "Login successfull"
-      }
-    } catch (error) {
-      return {
-        statusCode: error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
-        data: {},
-        message: error?.message || "Internal Server Error"
-      }
+    const accessToken = await this.authService.login(loginDto.email, loginDto.password);
+    return {
+      statusCode: HttpStatus.OK,
+      data: {
+        accessToken
+      },
+      message: "Login successfull"
     }
   }
 }
