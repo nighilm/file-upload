@@ -3,9 +3,9 @@ services:
   app:
     build:
       context: .
-      target: development
+      target: ${NODE_ENV}
     ports:
-      - '3000:3000'
+      - '${PORT}:${PORT}'
     volumes:
       - .:/usr/src/app
 
@@ -13,17 +13,17 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
 
   redis:
     image: redis:latest
     ports:
-      - '6379:6379'
+      - '${REDIS_PORT}:${REDIS_PORT}'
     volumes:
       - redis_data:/data
     healthcheck:

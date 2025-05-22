@@ -6,6 +6,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { FileStatusResponseDto, UploadDto, UploadResponseDto } from './dto/upload.dto';
 import { File, FileStatus } from '@prisma/client';
+import { CustomThrottlerGuard } from '../auth/guards/throttle.guard';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -33,26 +34,18 @@ export class UploadController {
             },
         },
     })
+    @UseGuards(CustomThrottlerGuard)
     @UseInterceptors(FileInterceptor('file', UploadService.getMulterOptions()))
     async uploadFile(@Req() req: Request, @UploadedFile() file: Express.Multer.File, @Body() { title, description }: UploadDto): Promise<UploadResponseDto> {
-        try {
-            const userId: number = req.user.id
-            const fileId: number = await this.uploadService.uploadFile(userId, file, title, description)
-            return {
-                statusCode: HttpStatus.CREATED,
-                data: {
-                    fileId, status: FileStatus.uploaded
-                },
-                message: "File upload successfull"
-            };
-
-        } catch (error) {
-            return {
-                statusCode: error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
-                data: {},
-                message: error?.message || "Internal Server Error"
-            }
-        }
+        const userId: number = req.user.id
+        const fileId: number = await this.uploadService.uploadFile(userId, file, title, description)
+        return {
+            statusCode: HttpStatus.CREATED,
+            data: {
+                fileId, status: FileStatus.uploaded
+            },
+            message: "File upload successfull"
+        };
     }
 
     @Get(':id')
@@ -62,20 +55,12 @@ export class UploadController {
     })
     @HttpCode(HttpStatus.OK)
     async getFileStatus(@Req() req: Request, @Param('id') fileId: string): Promise<FileStatusResponseDto> {
-        try {
-            const userId: number = req.user.id
-            const result: Partial<File> = await this.uploadService.getFileStatus(userId, parseInt(fileId))
-            return {
-                statusCode: HttpStatus.OK,
-                data: result,
-                message: "File status"
-            };
-        } catch (error) {
-            return {
-                statusCode: error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
-                data: {},
-                message: error?.message || "Internal Server Error"
-            }
-        }
+        const userId: number = req.user.id
+        const result: Partial<File> = await this.uploadService.getFileStatus(userId, parseInt(fileId))
+        return {
+            statusCode: HttpStatus.OK,
+            data: result,
+            message: "File status"
+        };
     }
 }
